@@ -1,0 +1,49 @@
+java 反射
+
+1. java.lang.Class  (Class Type)
+	面向對象的原理中，一般認為萬事萬物皆對象
+	那麼類也是對象，這個對象屬於哪個類呢？這個對象如何表示？
+	class A{}
+	A類的對象如何表示？  A a1 = new A(); --> a1即是
+	A類本身也是對象，是java.lang.Class類的對象
+	這個對象稱為類的類類型(Class Type)，如何表示呢？
+	有三種表示方式
+		a. 類名.class
+		b. 如果有對象存在，可以直接    對象.getClass()
+		c. Class.forName("類的全稱");  (含包名) //代表動態加載類
+		
+	1.2 理解動態加載類的用法  (Office案例)
+			將來功能性的類往往都是動態加載而非靜態加載
+			
+	1.3 Class類的常用方法
+			我們可以通過 Class類 就可以獲取類的所有信息
+			包括：方法、成員變量、構造函數  等等
+			
+2. 方法的反射 (java.lang.reflect.Method類的使用)
+	如何獲取某一個方法
+			方法的反射操作 method.invoke(object, 參數)
+			很多時候我們需要根據方法名稱調用方法		
+			
+			案例：根據javaBean的屬性名獲取其屬性值
+			
+3. 成員變量的反射
+	如何獲取某個成員變量
+	成員變量的反射操作 set/get
+	
+	案例：寫一個方法
+				public static void changeValue(Object obj)
+				把 obj字符串屬性的值都變成大寫，int屬性的值全部加100
+	
+	案例：寫一個方法
+				public static String getSql(Object object)
+				該方法返回值是 "insert into 類名(屬性1，屬性2...) values (?,?...)
+				
+4. 構造函數的反射
+	如何獲取某一個構造函數
+	如何通過構造函數的反射創建對象
+	
+5. 數組的反射
+	java中數組都是對象
+	數組的類類型的表示：對象.getClass、類型維數.class
+	
+	java.lang.reflect.Array

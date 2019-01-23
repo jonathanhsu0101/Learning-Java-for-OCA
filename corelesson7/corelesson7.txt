@@ -1,0 +1,33 @@
+GUI
+	java.awt.*; //创建用户界面和绘制图形图像的所有类。
+	java.awt.event.*; //事件
+	javax.swing.*; //創建用戶介面的組件(不建議使用awt包下的組件，
+								swing包下的組件基本都繼承了awt包下的組件)
+	java.awt.geom.*;
+	
+	1. 常用的簡單組件和布局
+		javax.swing.JFrame
+		javax.swing.JButton
+		布局：FlowLayout		水平布局
+							從上邊的中間開始放
+					BorderLayout	邊界布局
+							東南西北中
+					GridLayout		網格布局
+							x * y 的網格 (可以構造)
+		javax.swing.JPanel ---> 面板
+			a. 面板提供比窗體更豐富的操作 (比如畫圖)
+			b. 面板是沒有邊界的窗體 (沒有最大最小化)
+			c. 習慣上是在窗體上布局面板，面板上布局組件
+			
+	2. java事件機制
+		java中已經給所有的事件都分類了(和異常很像)
+		一個事件就會產生一個事件類的對象
+		給某個組件加上事件操作，就是要給一個組件加監聽器
+		如何加監聽器：
+				事件類型				監聽器類型			加監聽器的方式
+				ActionEvent			ActionListener		addActionListener(ActionListener)
+				XXEvent					XXListener				addXXListener(XXListener)
+				監聽器都是接口，實現接口的方法，就是事件要做的事情
+				
+				
+				

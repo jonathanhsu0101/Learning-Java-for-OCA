@@ -1,0 +1,42 @@
+開發工具 eclipse  (綠色、開源)
+
+JavaBean
+	javaBean就是一個java類
+	標準的javaBean就是一個java類：屬性private，有無參數的構造方法，
+			對所有的屬性都有getter/setter方法
+
+方法重寫 (補充)
+	在方法重寫(方法覆蓋)的時候 訪問權限可以擴大
+	要想重寫方法，父類中必須不能private，因為private子類無法直接訪問
+	訪問權限可以擴大，不能縮小
+
+java.lang.Object
+	1. 很多類都沒有導包 ，比如String類、Math類
+		都是java.lang包下的類，是jdk提供的，
+		jdk提供的類中，java.lang包下的類是不用導包，直接可用的
+	2. 一個類如果沒有父類，那麼它的父類就是Object類
+		java中的繼承是單一繼承，就是一個類只有一個直接的父類
+		java中的繼承具有傳遞性
+			a. A繼承了B，B繼承了C，C沒有父類
+			b. C的父類就是Object。那麼Object類中的元素繼承到C中，
+				就繼承到了B中，就繼承到了A中
+				可以認為B是A的父類，C也是A的父類，Object類也是A的父類
+	3. 在eclipse中如何看java的源代碼
+		一直按ctrl 讓滑鼠移到函數or類名上，第一次點擊會出現class介面
+		上面有一個選項 ---> Attach Source ---> 點擊 --->
+		選擇文件所有在地壓縮包或者文件夾
+	4. Object類中
+		equals方法(注意重載、重寫)
+		toString方法 ---> 打印對象就會打印該對象toString的返回內容
+	5. equals方法和hashCode方法
+		我們編程最終是需要和現實生活打交道，一般equals方法
+		會作為現實中兩個對象的比較，如果返回true，我們就認為
+		是同一個對象。所以在使用equals方法的時候要注意
+		用唯一標示生成hashCode和equals方法
+		直接利用eclipse工具幫我們生成即可
+
+變量的隱藏
+	方法有重寫or覆蓋，那麼成員變量呢？
+	---> 變量(非private)不存在覆蓋的問題
+
+

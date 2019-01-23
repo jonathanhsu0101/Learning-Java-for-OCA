@@ -1,0 +1,41 @@
+java 網路編程 (java.net包)
+
+1.	java.net.InetAddress 類
+2.	java.net.ServerSocket 類
+	java.net.Socket 類
+	
+	服務器端
+			端口(port)：	計算機上的服務都會運行在一個端口上
+						端口用整數表示，最多有65536個端口
+						1024以下的基本被占用，我們使用1024以上的
+						web服務用80
+			在計算機上開啟一個服務，需要占用一個端口
+			如何開啟一個服務？在java中使用 ServerSocket 類即可
+			ServerSocket s = new ServerSocket(port);
+			Socket socket = s.accept();
+			
+	客戶端
+			Socket socket = new Socket(ip, port);
+	Socket有兩個重要的方法
+		socket.getInputStream()
+		socket.getoutputStream()
+	這兩個方法在客戶端和服務器端之間形成管道，使兩端可以互傳信息
+	
+3.	聊天室 (支持群聊、私聊)
+	客戶端：a.	隨時要接收從服務器端發送過來的數據 (讀操作)
+					b.	隨時從鍵盤讀數據發送給服務器，
+			客戶端連上服務器之後，要開啟兩個線程來執行a, b
+			
+			私聊時：ip/內容
+			群聊時：內容
+					
+	服務器端：
+				a.	服務器端需要隨時讀取客戶端發來的數據，然後往外寫
+					寫成一個線程
+				b.	服務器要能夠保存所有產生的Socket對象，能夠遍歷，能夠查找	
+					
+4.	在網路傳送對象
+		先用 new ObjectInputStream(socket.getInputStream())，
+		以及 new ObjectOutputStream(socket.getOutputStream()) 建立管道後，
+		再透過 readObject() 方法讀進對象
+					 writeObject() 方法送出對象

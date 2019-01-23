@@ -1,0 +1,98 @@
+Java的異常處理
+
+1. 什麼是異常
+	test()
+	{
+		openFile(); //文件可能打不開
+		readFile(); //文件可能讀失敗
+		writetoOtherFile();
+		closeFile();
+	}
+	程序當中可能出現意外，如上
+	，當然也可能有內存不夠等等
+	
+	java中已經把異常or錯誤都分類了
+	首先分成兩大類
+	這兩大類都是java.lang.throwable的子類
+	java.lang.Error			系統級的異常，一般程序很難調試
+	java.lang.Exception	程序級的異常，通過代碼可以處理
+	
+2. java.lang.Exception 是一切程序級異常的父類
+	2.1 	java中把所有產生的程序級異常都分類了，我們
+			程序中出現的任何異常都能夠在分類中找到
+	2.2	Exception 大的方向也分成了兩種
+			2.2.1		jvm能自動捕獲的異常 java.lang.RuntimeException及其子類
+						當然也可以自己處理
+			2.2.2	jvm不能捕獲的異常，必須通過程序自己處理，
+						如果不處理，程序編譯不通過
+3. 如何自己去處理
+	test()
+	{
+		openFile();
+		if(打開成功)
+		{
+			readFile();
+			if (readFile成功)
+			{
+				writeFile();
+				if (writeFile成功){}else{}
+			}else{處理異常
+			}
+		}else{
+			//.....處理異常
+		}
+	}
+	以上方式實在太麻煩了。把本來的業務代碼和異常處理
+	代碼都混在一起，非常亂。
+	
+	3.1 java的處理方法：try catch 關鍵字
+			try
+			{
+				業務代碼(可能會產生異常)
+			}catch()
+			{
+				異常的處理
+			}
+	3.2	try 後面可以有多個 catch
+			多個 catch 的時候，子類一定要放在父類的前面
+			java.lang.Exception 是一般異常的父類，他可以
+			處理任何異常(但是比較不精確)
+	3.3	finally 關鍵字
+			不管有沒有異常，最終都要執行的語句 (有一些資源需要關閉)
+			例如：
+					try {} catch() {} finally {}
+					try {} finally {}
+					
+4. throw / throws 關鍵字
+	throw 在某種情況下，拋出 (製造出) 一個異常
+	throws 是用來迴避異常的
+	
+	注意：當子類重寫父類方法的時候，不能throws
+				比父類更多的異常(父類會處理不了)，除非多 throws 的異常是RuntimeException
+	
+	原理：java中，父類可以接受任何子類對象。如果子類比父類有更多的約束，
+				那麼父類處理不了就出問題了。所以在java中子父類進行繼承，
+				子類不能比父類有更多的約束。面向對象的設計中，有一個里氏替換原則，
+				說明的就是這個問題。
+				
+5. Exception 有幾個常用的方法 (子類都有)
+		getMessage()  獲取異常的信息
+		toString()
+		printStackTrace()
+		
+6. 自定義的異常
+	自定義的異常需要繼承已經提供的異常類
+	
+7. 有了異常之後一些細節要注意
+		如：函數如果有返回值，那麼不管有何異常產生都要保證函數有返回值
+		
+		問題：
+					函數如下  try {} catch () {} finally {} return 返回值
+							或者  try { return ...} catch() { return ...} finally {}
+					結果是 finally 先執行，還是 return 先執行？
+		答案：不管怎麼寫，函數遇到return 就結束，所以finally
+					一定在 return 之前執行		
+					
+					
+					
+					

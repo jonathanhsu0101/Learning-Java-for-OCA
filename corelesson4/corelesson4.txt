@@ -1,0 +1,149 @@
+java.io 包
+1. 編碼問題
+	a. 一個字符串放入文本文件 ---> 可以稱為字符串的序列化
+		從文本文件中讀取字符串 ---> 可以稱為字符串的反序列化
+		文本文件中的內容都是以字節的方式呈現的。
+		其實在字符串放入文本文件的時候，需要把字符串轉換成
+		字節，轉換成字節的時候可以選擇很多種編碼
+		以什麼樣的編碼方式轉換成字節的，將來再轉換成
+		字符串也需要用該編碼方式。
+	b. 常用的編碼
+		GBK，UTF-8，UTF-16BE
+		
+2. java.io.File 類：表示文件或目錄
+	2.1	文件常用的方法	FileDemo1.java
+	2.2	文件的過濾操作	FileDemo2.java
+				list()、listFiles()、list(FilenameFilter)、
+				listFiles(FileFilter or FilenameFilter)
+				注意遞歸的問題
+	2.3	文件的遞歸刪除：目錄必須為空，該目錄才能刪除
+			所以刪除一個目錄先要刪除目錄中的內容
+
+
+=========================================================
+
+文件的讀寫操作
+字節流 ---> 讀寫以字節為單位
+字符流 ---> 讀寫以字符為單位		只適合文本類文件，不適合二進制文件
+		輸入流 ---> 讀的操作
+		輸出流 ---> 寫的操作
+
+3. 以字節為單位的輸入輸出流
+		輸入流：InputStream    (讀)
+		----> FileInputStream 把文件以字節流進行讀取
+		----> BufferedInputStream (先讀入緩衝區)	
+		----> PipedInputStream 管道流
+		----> DataInputStream    分析讀寫的原理
+		----> System.in 從鍵盤讀 ----> 是PrintStream的實例，目標是標準輸入設備
+		輸出流：OutputStream (寫)
+		----> FileOutputStream 把文件以字節流進行寫入
+		----> BufferedOutputStream (先寫入緩衝區)
+		----> PipedOutputStream
+		----> DataOutputStream   分析讀寫的原理
+		----> System.out  ----> 是PrintStream的實例，目標是標準輸出設備
+		
+		FileOutputStream(String name, boolean append) 如果append設為true，
+					就不會刪除文件，而所有寫進去的資料會變成從文件後面添加進去
+
+		PipedOutputStream(PipedInputStream())
+		PipedInputStream(PipedOutputStream())
+		out寫出的數據正好被in讀到
+
+4.	字符流 (文本的操作) ---> 都是由字節流構造而來 (適配器模式)
+		輸入流 ----> Reader
+			對應的子類----> InputStreamReader
+								----> FileReader = InputStreamReader(new FileInputStream("檔名"))
+								----> BufferedReader   能夠讀字符了，
+											希望能一次讀一行，就是一個字符串
+											----> readLine
+								----> PrintReader
+		輸出流 ----> Writer
+			對應的子類----> OutputStreamWriter
+								----> FileWriter = OutputStreamWriter(new FileOutputStream("檔名"))
+								----> BufferedWriter
+											---> writer(str, 0, str.length) 寫入字符串
+											---> newLine() 寫入換行
+								----> PrintWriter 常取代BufferedWriter(new OutputStreamWriter(""))，
+																與BufferedReader(new InputStreamReader(""))搭配，
+																具有 println 使用較方便
+
+				例如：BufferedReader(new InputStreamReader(System.in)) 
+								---> 從System.in字節流轉換成字符流 (適配器模式)
+								---> 再加上一次讀一行的功能 (裝飾模式)
+
+5. RandomAccessFile   隨機訪問文件流
+									用在迅雷下載
+
+6. java.util.Properities ：利用資源文件進行動態加載
+	實際使用需要和IO結合在一起，本身並不是IO包的子類，而是HashTable的子類	
+
+	資源文件(xxx.properties，以properties作為文件的擴展名)
+	文件的內容是以 key = value 的方式存放的
+	本身是一個集合
+	
+	資源文件將來在設計中可以用來解耦 + (通常與)反射結合一起使用
+	
+	---> 簡單工廠設計模式	 ---> QQ在線升級 ---> 不必重新測試、發布
+	
+	properties文件的中文問題：新版本的eclipse都能直接轉換
+													如果不能，可以用native2ascii -encoding gbk 原文件 新文件
+													
+7.	如何用IO讀寫一個對象？首先要序列化
+			 (對象的序列化-->儲存，對象的反序列化-->讀取)
+			對象進行存儲 or 在網路中傳遞，必須先實現Serializable接口								
+			
+	7.1	java.io.ObjectOutputStream
+			java.io.ObjectInputStream
+			java.io.Serializable  //該接口只是一個規範，沒有任何方法
+			
+	7.2	transient關鍵字
+			如果一個對象的屬性用 transient 關鍵字修飾，那麼
+			該屬性不會做 jvm 默認的序列化工作，也就是這個狀態不會被存起來
+			可以通過如下的方法簽名做自己的序列化和反序列化工作
+			private void readObject(java.io.ObjectInputStream stream)
+					throws IOException, ClassNotFoundException
+			private void writeObject(java.io.ObjectOutputStream stream)
+					throws IOException
+	
+7.3	集合中的類是如何序列化的呢？ 比如 ArrayList	
+		ArrayList中有數組，且數組不一定放滿元素
+		所以沒有必要把整個數組序列化。只需要序列化有效元素
+		用了以上兩個方法簽名來進行序列化和反序列化。
+		這樣的話性能比較高
+		
+7.4	java實現接口、繼承都有傳遞性，所以
+		如果父類實現了Serializable 接口，那麼其子類都可以序列化
+		注意：
+				如果父類是可序列化的，在反序列化子類的時候，
+						不會調用父類的構造函數
+				如果父類是不可序列化的，而子類是可序列化的，
+						那在子類進行反序列化時，會調用父類的構造函數
+				(可序列化的就被存起來了，所以不會調用。
+				 不可序列化的不會被存起來，所以會調用)
+				SeriDemo2 案例進行了測試
+				
+7.5	java中有克隆(clone)的功能
+		Object類中已經提供該功能
+		一個類的對象要進行clone，該類可以直接實現Cloneable接口
+		(重寫clone()方法，擴大訪問權限。內建是protected)
+		屬於淺克隆 or 淺拷貝
+	
+		另外有深克隆 or 深拷貝 ----> 必須通過序列化和反序列化的方式來做
+		這其實是一個設計模式 ----> 原型模式
+	
+7.6	和集合一起操作
+				有如下文本文件：
+				1,zhangsan,28
+				2,lisi,29
+				3.wangwu,20
+				4,zhaoliu,33
+				5,zhangsan,28
+				6,zhangsan,28
+				7,lisi,29
+				8,zhangsan,28
+				9,tianqi,30
+要求統計姓名出現的次數，並按照次數降序輸出
+如果次數相同，按照姓名字母升序輸出
+思路：先一次讀一行(考IO)，然後進行字符串分割
+			把名字放入Map集合當中統計次數，再用TreeSet排序
+			

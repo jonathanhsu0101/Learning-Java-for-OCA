@@ -1,0 +1,162 @@
+集合操作 (java.util.*)
+java.util.Collection
+		----> java.util.List 可以放任何對象 (對象可以重複放)
+							----->java.util.ArrayList (Vector)
+							----->java.util.LinkedList
+		----> java.util.Set 集合中不能放重複對象
+										是否重複由equals方法決定
+
+1. java.util.ArrayList  (數組列表)
+	1.1 基本使用 (底層操作的就是數組，對數組
+							添加元素、移除元素、擴容等操作)
+			add 添加、 size 有效元素、get根據數據下標獲取
+			3種遍歷方式
+			contains 注意：和實際場景的使用
+			remove
+			clear
+			...
+			
+	1.2 集合中泛型的使用
+			集合容器可以容納任何對象
+			但是在實際應用中往往都是容納同一個類型的對象
+			
+			注意：泛型只在編譯階段有效，防止錯誤輸入，
+						如果繞過編譯那麼就可以繞過泛型
+			
+	1.3 ArrayList 源代碼
+			底層是數組 (在電影租賃項目中已經模擬過)
+			重要的成員：Object[] elementData;
+									int size 有效元素的個數
+									其實數組的初始大小是10
+									擴容、後移的操作
+									移除元素要前移
+			注意：ArrayList這種有數組作為底層的操作
+						最好估算元素的多少來指定底層數組的大小
+						ArrayList list = new ArrayList(大小給定);
+						來避免擴容操作，因為擴容操作會產生
+						垃圾，占用內存，性能較差
+						
+	1.4 java.util.Vector
+			底層也是數組的操作，所以大部分功能和 ArrayList 一樣
+			遍歷中有一種老的遍歷方式 Enumeration
+			ArrayList 存在的遍歷方式也都有
+			ArrayList 是線程不安全的,，Vector是線程安全的
+			jdk7之前的版本擴容大小稍有差異
+			
+2. LinkedList (鏈表結構)
+	2.1 基本使用與ArrayList類似
+			提供了更豐富的頭尾操作 addFirst, addLast, getFirst, getLast
+			removeFirst(), removeLast()
+	2.2 頭尾操作較多的場合適合使用 LinkedList
+			比如貪吃蛇
+			案例：控制台操作貪吃蛇
+						Node, Worm, WormPanel, WormTest
+	2.3 數據結構 (鏈表結構 ---> 雙向鏈表)
+			內部包含了一個靜態內部類 Node{	Object object;	
+																		Node next; 
+																		Node prev;	}
+																		
+3. java.util.HashSet 集合
+	3.1 基本使用
+			注意：容納的對象必須根據自己的唯一標示來重寫
+						equals和hashCode方法，對象不可重複
+			注意：對象一旦放入HashSet容器中
+						那麼對象的唯一標示屬性的值不能再修改
+						，否則會導致對象移除不了
+	3.2 HashSet的數據結構
+			HahsSet 底層用的就是 HashMap
+			所以很多底層的結構我們學完 HashMap之後 ，再看
+			
+4. java.util.TreeSet
+	TreeSet 中容納的對象，必須要能排序(排序方式由自己來定義)
+	兩種排序的比較器
+	4.1 java.lang.Comparable
+			如果TreeSet使用無參數的構造函數，那麼
+			容納的對象必須實現Comparable接口
+	4.2 java.util.Comparator
+			TreeSet構造的時候使用 Comparator 作為構造函數的參數
+			比較方法如果返回0，那麼對象不能重複加入
+			如果寫成匿名類，優先級較高
+	4.3 數據結構底層是 TreeMap
+			關於Tree的結構我們可以不用深入了解，熟悉使用即可
+			
+			
+java.util.Map
+	----> java.util.HashMap
+	----> java.util.TreeMap
+	----> java.util.Hashtable
+			
+5. java.util.HashMap (key / value) (唯一標示 / 值)
+	5.1 基本操作
+	5.2 用HashMap的泛型實現基本操作避免強制類型轉換
+	5.3 <HashMap>.put(key, value)如果key相同，後面的value會覆蓋前面的
+			這個特點特別適合用來做計數
+	5.4 HashMap 的數據結構 (數組 + 鏈表的結構)
+			分析源代碼
+			a. HashMap 包含了一個 Entry(key, value, next, hash) 的內部類
+				key / value 放入 HashMap 的時候都會被包裝成 Entry 的對象
+			b. HashMap 成員就有 Entry 的數組，該數組的大小默認是16
+				，永遠是 2 的次方數，如果自己給出的不是 2的次方數，
+				會轉換成大於並最接近於自己給出的 2的次方數
+				put(key, value) 時其實就是轉換成 Entry 對象並放入數組中
+			c. put 方法的實現
+				c.1 根據 key 的 hashCode 進行 hash 運算 (hash算法不用管)
+						得到hash值
+				c.2 根據 hash值去確定數組的位置
+						hash & (table.length-1)
+						等價於 hash % table.length  ----> 當 length 是2的次方數，該公式就成立
+						正好獲取了數組的位置
+				c.3 如果這個位置沒有元素存在，直接包裝 Entry 的實例
+						並給數組元素賦值
+						如果計算出的位置已經有元素存在，就要判斷是否
+						key 相同，如果相同則覆蓋，並且要遍歷整個鏈表
+						如果都不覆蓋，插入到鏈表的頭部
+						
+						注意一；如果計算出來的位置相同，稱為衝突率
+								要減少衝突率，因為一旦放入鏈表中，
+								以後總是要遍歷鏈表，效率差，要盡量把
+								元素直接放入數組，而非鏈表。
+								根據實際要求(唯一標示)重寫 hashCode和equals方法
+								
+						注意二；底層是數組，盡量減少擴容，所以
+								HashMap放入元素的時候也應該估算
+								數組的大小，避免擴容操作
+						
+						HashMap 中有加載因子，默認是0.75。比如默認大小16
+						，那麼數組已經有12個元素時，會自動擴容
+	
+				c.4 get方法實現
+						通過key查找元素的算法和put放入是一樣的。
+						所以一旦key放入HashMap就不應該修改
+						跟hashCode或equals方法生成相關的屬性值(唯一標示)了
+						，否則就找不到了。
+						
+						在HashSet中我們提過這個。那麼看一下HashSet的源碼
+						HashSet底層操作的就是HashMap
+						HashSet的add方法只用了HashMap的key，value是死的
+						，所以數據結構是一樣的。
+	
+6. TreeMap (key, value)
+	key必須要能夠根據某個規則排序
+	通過兩種比較器，TreeSet 底層用的就是 TreeMap
+	
+7. Hashtable
+	7.1	和 HashMap 相比，類的層次結構不一樣，當然都實現了Map接口
+			基本操作類似
+	7.2	HashMap 中 key / value 都可以是 null
+			而 Hashtable 不能是 null，會拋出 NullPointException 異常
+	7.3	Hashtable 是線程安全的 	(線程並發時效率低，但是數據一致性高)
+			HashMap 是線程不安全的 	(線程並發時效率高，數據可能存在安全問題)
+	7.4	Hashtable 還有一個子類
+			叫做 java.util.Properties 類，這個類在將來用的比較多，用來加載資源文件
+			講 IO 操作的時候會詳細講解
+			
+8. 其他
+	還有一些集合類，大家可以查閱幫助文檔，最常用的我們已經介紹過了
+	java.util.Collections類
+	該類封裝了一些對集合的操作，都是靜態方法
+	面試時也會問和Collection類有什麼關係，其實沒什麼關係
+	介紹兩個類的用途即可
+
+	
+	

@@ -1,0 +1,120 @@
+java 線程
+	進程：進程就是計算機的運行線索
+	線程：進程的運行線索，計算機運行的最小單位
+
+1. java 中如何創建一個線程
+	1.1 以實現了Runnable接口的類的實例作為創建
+			Thread類對象的構造函數的參數
+			主函數本身就是一個線程
+	1.2 直接創建類繼承Thread，重寫run方法
+			兩種方法都可以：建議使用第一種，更加面向對象
+			一個Runnable的實例我們認為就是一個任務
+	1.3 直接用匿名類對象的方式
+	
+2. java線程的生命週期
+	newBorn		新生狀態
+	Pause			阻塞狀態
+	Runnable	可執行狀態 (Running, Ready)
+	Dead	(不是stop ---> 死不能復生)
+	
+	多線程的程序經常運行結果每次不一樣 (why?)
+	Runnable (Running/Ready) 跟這個狀態有關係
+	
+3. java線程中的常用方法
+	3.1 常用的方法  setName   getName
+			Thread.currentThread   優先級設置的方法等
+	3.2 Thread.sleep() 讓線程睡，線程就進入阻塞狀態
+			sleep()是靜態方法，哪個線程執行到sleep，哪個線程就去sleep
+			應該寫成Thread.sleep()，而不要寫成t1.sleep() 
+			 (雖然效果相同，但是容易誤解)
+		 interrupt() 方法：中止某線程
+		 join() 方法：一個線程等待另一個線程結束
+		 Thread.yield() ：(靜態) 主動放棄CPU，把機會讓給別的線程
+										，然後參與競爭   Running ----> Ready
+										 
+4. 線程的互斥操作 ---> 多個線程之間共享數據的問題
+	4.1 同步塊
+			synchronized()
+			鎖 (java中任何對象都有一把鎖，且只有一把鑰匙)
+	4.2 同步函數
+			也有鎖存在的 ---> 普通方法加同步，鎖就是當前對象
+			靜態函數同步也是有鎖的 ---> 鎖是當前類的類類型
+			
+	注意：多個線程共享數據要保證安全，
+					一定要保證用的是同一個對象鎖
+					
+	注意：死鎖的問題  死鎖程序就卡死，無法調試
+					---> 可以利用好的工具來檢查死鎖
+					---> 要慎用 synchronized 關鍵字
+					
+	注意：我們講過 StringBuilder / StringBuffer (線程安全)
+					還有集合類：ArrayList / Vector (線程安全)
+	
+	4.3 Lock
+			synchronized 很繁瑣，比較不好理解，而且不面向對象
+			java5 版本開始做了很好的改進，有了 Lock對象
+			更加面向對象，語法也比較不複雜
+			
+			擴展內容：緩存操作，讀寫鎖操作：案例CacheDemo
+									or 查看幫助文檔
+			
+5. 線程的通訊
+	5.1	通過管道進行簡單的通訊 (性能比較差，
+			只能交互簡單數據)
+	5.2	Thread.yield() 方式
+			生產者，消費者的模型
+			效率也比較差。不建議用
+			yield是主動放棄CPU，但是又去參與競爭
+	5.3	wait / notify
+			任何一個對象都擁有一個線程等待池
+			掛在同一個對象的線程等待池中的線程之間可以互相喚醒
+			wait / notify 方法是屬於 Object 類的
+			wait必須放在synchronized同步塊中使用
+			先學會搭模型
+			
+			面試題：ThreadDemo18
+				先A線程運行10次，然後B線程運行20次，
+				如此反覆50次
+			理解：	A線程生產者		生產食物需要循環10次
+							B線程消費者		消費食物需要循環20次
+			改進：A 10次  B 20次  C 30次    如此50次
+							
+	5.4	java5中引入了新的線程通訊方式 (了解)
+			用的是鎖機制 (不是wait / notify)
+			同步塊要換成鎖，Lock XXX = new ReentrantLock();
+			this.wait()改成condition.await()
+			this.notify()改成condition.signal()
+			condition 要綁定在一個鎖對象上面
+			
+			java5引入的線程機制放 在這些包內：
+					java.util.concurrent
+					java.util.concurrent.locks
+							
+6.	線程範圍內數據共享
+	6.1	HashMap<Thread, Object>
+	6.2	java中提供了 ThreadLocal 這個類，已經完成了類似的
+			功能，我們可以直接使用
+	6.3	寫一個類，使得該類在創建對象時，創建完之後，
+			直接就是同一個線程，同一個對象，不同線程，不同對象
+			
+			不管是單利模式還是這種情況，我們都使得構造函數private
+			，這種情況對反射來說是無效的。
+			
+7.	java線程池  ----->  java5 引入的   了解即可
+	線程並不是越多越好，如果無限制的創建線程
+	那麼線程的創建、銷毀等有很大的消耗
+	希望不管執行多少任務，都用固定的線程數來執行
+	7.1	如何創建線程池
+			Executors類
+				newFixedThreadPool()方法
+				newSingleThreadExecutor()方法
+				newCachedThreadPool()方法
+				newScheduledThreadPool方法
+			Executors接口
+			ScheduledExecutorService類
+				scheduleAtFixedRate()方法
+8.	Callable & Future
+	java5 開始才有 ----->  了解即可
+				
+				
+			
